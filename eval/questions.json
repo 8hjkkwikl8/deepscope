@@ -1,0 +1,38 @@
+[
+  {
+    "id": "q1",
+    "query": "多智能体系统在企业知识工作中的落地路径与 ROI 评估",
+    "deep": false,
+    "must_cover": ["多智能体", "ROI", "知识"]
+  },
+  {
+    "id": "q2",
+    "query": "LangGraph、AutoGen 与 CrewAI：2026 年 AI Agent 框架怎么选",
+    "deep": true,
+    "must_cover": ["LangGraph", "AutoGen", "CrewAI"]
+  },
+  {
+    "id": "q3",
+    "query": "RAG 与长上下文模型在专业文档问答中的取舍",
+    "deep": false,
+    "must_cover": ["RAG", "长上下文", "文档"]
+  },
+  {
+    "id": "q4",
+    "query": "企业级 AI 应用如何设计引用溯源与幻觉评测体系",
+    "deep": true,
+    "must_cover": ["引用", "幻觉", "评测"]
+  },
+  {
+    "id": "q5",
+    "query": "AI Agent 在生产环境中的可观测性与故障恢复怎么做",
+    "deep": false,
+    "must_cover": ["可观测", "故障", "生产"]
+  },
+  {
+    "id": "q6",
+    "query": "大模型应用的推理成本优化：缓存、路由与小模型组合",
+    "deep": false,
+    "must_cover": ["缓存", "路由", "成本"]
+  }
+]

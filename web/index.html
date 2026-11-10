@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DeepScope · 多智能体深度研究助手</title>
+  <meta name="description" content="四个 Agent 协作完成深度研究：规划、并行检索、证据审阅、流式写作，每条结论带可点击来源。">
+  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <div class="ambient" aria-hidden="true"></div>
+  <div class="grid-overlay" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 40 40" fill="none">
+          <circle cx="20" cy="20" r="13" stroke="url(#brandGrad)" stroke-width="1.6" opacity=".9"/>
+          <circle cx="20" cy="20" r="7" stroke="url(#brandGrad)" stroke-width="1.4" opacity=".5"/>
+          <circle cx="20" cy="20" r="2" fill="#5eead4"/>
+          <path d="M20 3v6M20 31v6M3 20h6M31 20h6" stroke="url(#brandGrad)" stroke-width="1.4" stroke-linecap="round" opacity=".65"/>
+          <defs>
+            <linearGradient id="brandGrad" x1="0" y1="0" x2="40" y2="40">
+              <stop stop-color="#5eead4"/><stop offset="1" stop-color="#818cf8"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <span class="brand-name">DeepScope</span>
+        <span class="brand-sub">多智能体深度研究</span>
+      </div>
+    </div>
+
+    <nav class="topnav" aria-label="主导航">
+      <button class="nav-link active" id="navWorkbench">工作台</button>
+      <button class="nav-link" id="navHistory">运行记录</button>
+      <button class="nav-link" id="navArchitecture">系统架构</button>
+    </nav>
+
+    <div class="top-actions">
+      <span class="mode-chip loading" id="modeChip"><span class="mode-dot"></span><span id="modeText">连接中</span></span>
+      <button class="icon-btn" id="settingsBtn" title="模型设置" aria-label="模型设置">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round">
+          <circle cx="12" cy="12" r="3.2"/>
+          <path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.1V21a2 2 0 1 1-4 0v-.09A1.7 1.7 0 0 0 8.6 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.1-.4H3a2 2 0 1 1 0-4h.09A1.7 1.7 0 0 0 4.6 8.6a1.7 1.7 0 0 0-.34-1.88l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-.6 1.7 1.7 0 0 0 .4-1.1V3a2 2 0 1 1 4 0v.09A1.7 1.7 0 0 0 15.4 4.6a1.7 1.7 0 0 0 1.88-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.4 9c.14.37.36.7.66.98.29.26.66.4 1.04.42H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.51.6Z"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" id="hero">
+      <div class="hero-inner">
+        <div class="eyebrow">
+          <span class="pulse-dot"></span>
+          MULTI-AGENT RESEARCH ENGINE
+          <span class="eyebrow-sep">/</span>
+          v1.0
+        </div>
+
+        <h1>让四个 Agent 协作，<br><span class="gradient-text">完成一次有据可查的深度研究。</span></h1>
+        <p class="hero-sub">规划问题 · 并行检索 · 审阅证据 · 流式写作。每条关键结论都带可点击的来源编号，而不是一段无法追溯的生成文本。</p>
+
+        <form class="query-card" id="researchForm" autocomplete="off">
+          <div class="query-top">
+            <textarea id="queryInput" rows="2" maxlength="500" placeholder="输入一个值得深入研究的问题…" aria-label="研究问题"></textarea>
+            <button type="submit" class="submit-btn" id="submitBtn" aria-label="开始研究" disabled>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M5 12h13M13 6l6 6-6 6"/>
+              </svg>
+            </button>
+          </div>
+          <div class="query-bottom">
+            <div class="depth-toggle" role="group" aria-label="研究深度">
+              <button type="button" class="depth-opt active" data-deep="false">标准</button>
+              <button type="button" class="depth-opt" data-deep="true">深度</button>
+            </div>
+            <span class="kbd-hint">Enter 开始 · Shift + Enter 换行</span>
+          </div>
+        </form>
+
+        <div class="examples" id="examples">
+          <span class="examples-label">试试这些</span>
+          <button type="button" class="example-chip" data-query="多智能体系统在企业知识工作中的落地路径与 ROI 评估">多智能体落地与 ROI</button>
+          <button type="button" class="example-chip" data-query="LangGraph、AutoGen 与 CrewAI：2026 年 AI Agent 框架怎么选">Agent 框架选型</button>
+          <button type="button" class="example-chip" data-query="RAG 与长上下文模型在专业文档问答中的取舍">RAG vs 长上下文</button>
+          <button type="button" class="example-chip" data-query="企业级 AI 应用如何做引用溯源与幻觉评测">引用溯源与评测</button>
+        </div>
+
+        <div class="agent-line" aria-label="Agent 团队">
+          <div class="agent-intro" data-agent="planner">
+            <div class="agent-intro-top"><span class="mini-avatar planner">规</span><span class="agent-en">PLANNER</span></div>
+            <h3>规划</h3>
+            <p>把模糊大问题拆成 3-5 个可检索、可验证的子问题。</p>
+          </div>
+          <div class="agent-intro" data-agent="researcher">
+            <div class="agent-intro-top"><span class="mini-avatar researcher">研</span><span class="agent-en">RESEARCHER</span></div>
+            <h3>研究</h3>
+            <p>并行搜索、阅读原文，提炼带 [S#] 引用的结构化笔记。</p>
+          </div>
+          <div class="agent-intro" data-agent="critic">
+            <div class="agent-intro-top"><span class="mini-avatar critic">审</span><span class="agent-en">CRITIC</span></div>
+            <h3>审阅</h3>
+            <p>专门挑刺：找证据缺口、反方观点和来源矛盾。</p>
+          </div>
+          <div class="agent-intro" data-agent="writer">
+            <div class="agent-intro-top"><span class="mini-avatar writer">写</span><span class="agent-en">WRITER</span></div>
+            <h3>写作</h3>
+            <p>综合笔记流式撰写简报，并自动做引用校验。</p>
+          </div>
+        </div>
+
+        <div class="hero-foot">
+          <div class="foot-stat"><strong>4</strong><span>协作 Agent</span></div>
+          <div class="foot-stat"><strong>实时</strong><span>事件流可视化</span></div>
+          <div class="foot-stat"><strong>可核验</strong><span>引用回溯原文</span></div>
+          <div class="foot-stat"><strong>可导出</strong><span>Markdown 简报</span></div>
+        </div>
+
+        <div class="demo-notice hidden" id="demoNotice">
+          <span class="demo-dot"></span>
+          <span>当前为<strong>演示模式</strong>：报告由内置模拟模型生成，检索仍会真实执行。配置 API Key 后可获得真实研究结果。</span>
+          <button type="button" class="text-btn" id="demoSettingsBtn">接入模型</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="workspace hidden" id="workspace">
+      <div class="workspace-head">
+        <div class="ws-query">
+          <div class="ws-kicker">RESEARCH RUN <span class="mono" id="runIdShort"></span></div>
+          <h2 id="runQuery"></h2>
+        </div>
+        <div class="ws-actions">
+          <div class="run-meta" id="runMeta"></div>
+          <button class="ghost-btn" id="newRunBtn">新建研究</button>
+          <button class="ghost-btn" id="downloadBtn" disabled>下载 .md</button>
+          <button class="ghost-btn" id="copyBtn" disabled>复制</button>
+          <button class="ghost-btn danger hidden" id="cancelBtn">取消</button>
+        </div>
+      </div>
+
+      <div class="workspace-grid">
+        <aside class="rail">
+          <div class="panel stage-panel">
+            <div class="panel-head"><span>执行流程</span><span class="mono" id="progressLabel">0%</span></div>
+            <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+            <div class="stepper" id="stepper">
+              <div class="step" data-stage="planning"><span class="step-dot"></span><span class="step-label">规划</span></div>
+              <div class="step" data-stage="research"><span class="step-dot"></span><span class="step-label">研究</span></div>
+              <div class="step" data-stage="review"><span class="step-dot"></span><span class="step-label">审阅</span></div>
+              <div class="step" data-stage="writing"><span class="step-dot"></span><span class="step-label">写作</span></div>
+              <div class="step" data-stage="done"><span class="step-dot"></span><span class="step-label">完成</span></div>
+            </div>
+          </div>
+
+          <div class="panel agents-panel">
+            <div class="panel-head"><span>Agent 团队</span><span class="mono" id="agentCount">4</span></div>
+            <div class="agent-list">
+              <div class="agent-row" data-agent="planner">
+                <span class="agent-avatar planner">规</span>
+                <div class="agent-info"><strong>规划 Agent</strong><span>拆解研究问题</span></div>
+                <span class="status-dot idle" title="等待"></span>
+              </div>
+              <div class="agent-row" data-agent="researcher">
+                <span class="agent-avatar researcher">研</span>
+                <div class="agent-info"><strong>研究 Agent</strong><span>检索与阅读</span></div>
+                <span class="status-dot idle" title="等待"></span>
+              </div>
+              <div class="agent-row" data-agent="critic">
+                <span class="agent-avatar critic">审</span>
+                <div class="agent-info"><strong>审阅 Agent</strong><span>找证据缺口</span></div>
+                <span class="status-dot idle" title="等待"></span>
+              </div>
+              <div class="agent-row" data-agent="writer">
+                <span class="agent-avatar writer">写</span>
+                <div class="agent-info"><strong>写作 Agent</strong><span>综合与引用</span></div>
+                <span class="status-dot idle" title="等待"></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel log-panel">
+            <div class="panel-head"><span>实时事件</span><span class="live-indicator"><span class="live-dot"></span>LIVE</span></div>
+            <div class="log" id="log" aria-live="polite"></div>
+          </div>
+        </aside>
+
+        <section class="panel report-panel">
+          <div class="report-head">
+            <div class="report-tabs" role="tablist">
+              <button class="tab active" data-tab="report" role="tab">研究报告</button>
+              <button class="tab" data-tab="sources" role="tab">来源 <span class="tab-count" id="sourceCount">0</span></button>
+              <button class="tab" data-tab="notes" role="tab">研究笔记 <span class="tab-count" id="noteCount">0</span></button>
+            </div>
+            <div class="report-meta" id="reportMeta"></div>
+          </div>
+          <div class="report-body">
+            <div class="tab-pane active" id="tab-report">
+              <div class="report-placeholder" id="reportPlaceholder">
+                <div class="scanner"><span></span></div>
+                <p>研究团队正在启动…</p>
+                <div class="question-chips" id="questionChips"></div>
+              </div>
+              <article class="prose hidden" id="reportContent"></article>
+              <div class="citation-bar hidden" id="citationBar"></div>
+            </div>
+            <div class="tab-pane" id="tab-sources">
+              <div class="sources-list" id="sourcesList">
+                <div class="empty-state">来源会随检索实时出现</div>
+              </div>
+            </div>
+            <div class="tab-pane" id="tab-notes">
+              <div class="notes-list" id="notesList">
+                <div class="empty-state">研究员完成阅读后会生成结构化笔记</div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <div class="drawer-overlay hidden" id="drawerOverlay"></div>
+  <aside class="drawer" id="historyDrawer" aria-label="运行记录">
+    <div class="drawer-head">
+      <div>
+        <span class="drawer-kicker">ARCHIVE</span>
+        <h3>运行记录</h3>
+      </div>
+      <button class="icon-btn" id="closeHistory" aria-label="关闭">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+    <div class="drawer-body" id="historyList"><div class="empty-state">还没有运行记录</div></div>
+    <div class="drawer-foot">报告与事件流已持久化到本地 <span class="mono">data/runs/</span></div>
+  </aside>
+
+  <div class="modal-overlay hidden" id="settingsModal">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+      <div class="modal-head">
+        <div>
+          <span class="drawer-kicker">MODEL SETTINGS</span>
+          <h3 id="settingsTitle">接入大模型</h3>
+        </div>
+        <button class="icon-btn" id="closeSettings" aria-label="关闭">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-hint">任意 OpenAI 兼容接口即可。Key 只保存在当前服务进程内存中，不写入磁盘；需要持久化请编辑 <span class="mono">.env</span>。</p>
+        <label class="field">
+          <span>Base URL</span>
+          <input id="baseUrlInput" list="baseUrlPresets" placeholder="https://api.deepseek.com/v1">
+          <datalist id="baseUrlPresets">
+            <option value="https://api.deepseek.com/v1">DeepSeek</option>
+            <option value="https://dashscope.aliyuncs.com/compatible-mode/v1">通义千问</option>
+            <option value="https://api.openai.com/v1">OpenAI</option>
+            <option value="https://open.bigmodel.cn/api/paas/v4">智谱 GLM</option>
+            <option value="https://api.moonshot.cn/v1">Kimi</option>
+          </datalist>
+        </label>
+        <div class="field-row">
+          <label class="field">
+            <span>模型名</span>
+            <input id="modelInput" placeholder="deepseek-chat">
+          </label>
+          <label class="field">
+            <span>搜索源</span>
+            <select id="searchProviderInput">
+              <option value="auto">自动（360 → 搜狗 → Bing）</option>
+              <option value="so360">360 搜索（推荐）</option>
+              <option value="sogou">搜狗</option>
+              <option value="bing">Bing RSS</option>
+              <option value="tavily">Tavily（最稳定）</option>
+              <option value="offline">离线演示</option>
+            </select>
+          </label>
+        </div>
+        <label class="field">
+          <span>API Key</span>
+          <div class="key-wrap">
+            <input id="apiKeyInput" type="password" placeholder="留空则保持当前配置" autocomplete="off">
+            <button type="button" class="text-btn" id="toggleKey">显示</button>
+          </div>
+        </label>
+        <label class="field">
+          <span>Tavily API Key <em>可选，仅在选择 Tavily 时需要</em></span>
+          <input id="tavilyKeyInput" type="password" placeholder="tvly-..." autocomplete="off">
+        </label>
+        <div class="modal-note" id="settingsStatus">当前状态加载中…</div>
+      </div>
+      <div class="modal-foot">
+        <button class="ghost-btn" id="demoModeBtn">切换演示模式</button>
+        <div class="modal-actions">
+          <button class="ghost-btn" id="cancelSettings">取消</button>
+          <button class="primary-btn" id="saveSettings">测试并保存</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay hidden" id="archModal">
+    <div class="modal wide" role="dialog" aria-modal="true" aria-labelledby="archTitle">
+      <div class="modal-head">
+        <div>
+          <span class="drawer-kicker">SYSTEM DESIGN</span>
+          <h3 id="archTitle">它是怎么工作的</h3>
+        </div>
+        <button class="icon-btn" id="closeArch" aria-label="关闭">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="arch-flow">
+          <div class="arch-node"><span>01</span><strong>Planner</strong><p>拆解子问题，约束数量与检索词</p></div>
+          <div class="arch-arrow">→</div>
+          <div class="arch-node"><span>02</span><strong>Researcher ×N</strong><p>并发检索、安全抓取、结构化笔记</p></div>
+          <div class="arch-arrow">→</div>
+          <div class="arch-node"><span>03</span><strong>Critic</strong><p>找缺口，触发一轮补充检索</p></div>
+          <div class="arch-arrow">→</div>
+          <div class="arch-node"><span>04</span><strong>Writer</strong><p>流式写作 + 引用校验 + 导出</p></div>
+        </div>
+        <div class="arch-grid">
+          <div>
+            <h4>工程要点</h4>
+            <ul class="clean-list">
+              <li>全链路 SSE：Agent 的搜索、阅读、笔记、写作事件实时可见</li>
+              <li>证据闭环：编号来源贯穿笔记、写作、引用校验与导出</li>
+              <li>并发编排：子问题并行、抓取限流、失败子任务隔离</li>
+              <li>安全默认：URL 私网校验（SSRF）、Markdown 消毒、Key 不落盘</li>
+              <li>可降级：Tavily / 360 / 搜狗 / Bing / 离线多级搜索回退</li>
+            </ul>
+          </div>
+          <div>
+            <h4>技术栈</h4>
+            <div class="stack-chips">
+              <span>Python 3.13</span><span>FastAPI</span><span>AsyncIO</span><span>httpx</span>
+              <span>SSE</span><span>BeautifulSoup</span><span>Vanilla JS</span><span>Marked + DOMPurify</span>
+            </div>
+            <h4 class="mt">可讲的设计取舍</h4>
+            <p class="arch-p">没有引入 LangChain：四角色编排逻辑透明、可控、易调试，也更适合展示对 Agent 原理的理解。搜索层做成可插拔，避免把系统绑死在单一数据源上。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status"></div>
+
+  <noscript>DeepScope 需要启用 JavaScript 才能运行。</noscript>
+  <script src="/static/vendor/marked.min.js"></script>
+  <script src="/static/vendor/purify.min.js"></script>
+  <script src="/static/app.js"></script>
+</body>
+</html>
