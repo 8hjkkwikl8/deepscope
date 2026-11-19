@@ -8,7 +8,7 @@ DeepScope 是一个可以直接运行、可以现场演示的多 Agent 研究系
 
 这个项目的重点不是"再包一层 Agent 框架"，而是把 **编排、事件流、引用闭环、降级策略** 这四件在真实产品里最容易出问题的事做扎实。
 
-## 功能一览
+## Features · 功能一览
 
 - **四个 Agent 角色**：规划、研究、审阅、写作，各自有独立提示词与结构化输出约束。
 - **实时事件流**：搜索、抓取、阅读、笔记、审阅、token 流、引用校验全程可见；支持断线重连与事件去重。
@@ -19,7 +19,7 @@ DeepScope 是一个可以直接运行、可以现场演示的多 Agent 研究系
 - **可演示的 UI**：工作台、实时日志、来源卡片、研究笔记、运行历史、模型设置、系统架构说明、Markdown 导出。
 - **可复现的评测与测试**：17 个单元/集成测试、离线评测脚本与指标报告。
 
-## 60 秒跑起来
+## Installation & Usage · 60 秒跑起来
 
 要求 Python 3.11+，Windows 直接双击 `run.bat` 即可（自动检查依赖，缺失时用阿里云镜像安装）。
 
@@ -32,7 +32,11 @@ python run.py
 
 打开 <http://127.0.0.1:8765>。未配置 API Key 时自动进入演示模式：搜索与抓取仍然真实执行，报告由内置模拟模型生成，内容与判断不代表真实研究结论。
 
-## 接入真实模型
+## Demo · 演示模式
+
+无需 API Key：启动后直接输入开放问题，即可走完规划、检索、审阅、写作与引用校验全流程，报告明确标注演示数据。工作台界面见上方截图，运行历史与 Markdown 导出都可直接查看。
+
+## Connect Real Models · 接入真实模型
 
 任选一种方式：
 
@@ -47,7 +51,7 @@ python run.py
 
 搜索默认使用免 Key 的 360 搜索，可选搜狗、Bing RSS、Tavily 或离线数据。若本机需要代理访问外网，在 `.env` 中设置 `HTTP_PROXY`。
 
-## 它是怎么工作的
+## Architecture · 它是怎么工作的
 
 ```mermaid
 flowchart LR
@@ -78,7 +82,7 @@ flowchart LR
 
 更多设计细节见 [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)。
 
-## 评测
+## Evaluation · 评测
 
 `eval/` 提供了一个可复现的评测脚本，默认离线运行（Mock 模型 + 离线搜索 + 模拟抓取），衡量的是流程指标与引用纪律，而不是答案正确性：
 
@@ -99,7 +103,7 @@ python eval/run_eval.py --offline
 
 完整表格见 [eval/report.md](eval/report.md)。接真实模型后可去掉 `--offline`，用同一套指标做回归对比。真实产品还应叠加人工评分或 LLM-as-judge，这部分我在报告里明确标注为"流程指标"而不是"质量结论"。
 
-## 测试
+## Testing · 测试
 
 ```bash
 python -m unittest discover -s tests -v
@@ -107,7 +111,7 @@ python -m unittest discover -s tests -v
 
 覆盖引用解析与清洗、统计口径、来源注册并发去重、SSRF 防护、HTML 正文提取与编码回退、持久化、Mock 全流程、单子问题失败隔离，共 17 个测试。
 
-## 项目结构
+## Project Structure · 项目结构
 
 ```
 deepscope/
@@ -128,6 +132,10 @@ deepscope/
 └─ requirements.txt
 ```
 
+## Deployment · 部署
+
+单机单进程应用，本地即可运行：Windows 双击 `run.bat`，任一平台执行 `python run.py`。当前不提供公网托管版本，也没有登录鉴权，请勿直接暴露到公网。
+
 ## API
 
 | 方法 | 路径 | 说明 |
@@ -142,7 +150,7 @@ deepscope/
 | POST | `/api/runs/{id}/cancel` | 取消运行 |
 | GET | `/api/runs/{id}/report.md` | 下载 Markdown 报告 |
 
-## 已知限制
+## Known Limitations · 已知限制
 
 - 演示模式的报告是模板化内容，只用于展示流程与引用机制；接入真实模型后才有研究价值。
 - 360 / 搜狗为网页解析，可能触发限流；系统会自动降级到下一个搜索源。
@@ -150,7 +158,7 @@ deepscope/
 - 评测指标衡量引用纪律与主题覆盖，不衡量事实正确性；生产场景需要人工评分、事实核验与回归集。
 - 长报告在流式阶段按 90ms 节流渲染，超大文档（>5 万字）建议改为分段渲染或虚拟列表。
 
-## 面试讲解
+## Interview Walkthrough · 面试讲解
 
 - [docs/INTERVIEW.md](docs/INTERVIEW.md)：30 秒介绍、2 分钟演示脚本、5 分钟架构讲解、常见追问与回答。
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)：模块职责、事件协议、并发与失败模型、关键取舍。
